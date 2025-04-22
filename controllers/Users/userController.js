@@ -2,6 +2,10 @@ const Login = require('../../models/User');
 const bcrypt = require('bcrypt');
 const moment = require('moment');
 const Favourite = require('../../models/Favourite');
+const jwt = require('jsonwebtoken');
+
+
+const JWT_SECRET = process.env.JWT_SECRET || 'ZooberUser';
 
 exports.userSignUp = async (req, res) => {
     const { mobile, email, password, name } = req.body;
@@ -97,8 +101,8 @@ exports.fetchUserDetails = async (req, res) => {
 };
 exports.userLogin = async (req, res) => {
     const { mobile, password } = req.body;
-
     const mobileRegex = /^\d{10}$/;
+
     if (!mobile || !mobileRegex.test(mobile)) {
         return res.status(400).json({ success: false, message: 'Mobile number must be 10 digits.' });
     }
@@ -112,11 +116,28 @@ exports.userLogin = async (req, res) => {
         if (!user) {
             return res.status(401).json({ success: false, message: 'Invalid mobile number or password.' });
         }
+
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(401).json({ success: false, message: 'Invalid mobile number or password.' });
         }
-        return res.status(200).json({ success: true, message: 'Login successful', user });
+
+        const token = jwt.sign(
+            { id: user._id, mobile: user.mobile },
+            JWT_SECRET,
+            { expiresIn: '1d' }
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: 'Login successful',
+            token: `Bearer ${token}`,
+            user: {
+                id: user._id,
+                mobile: user.mobile,
+            }
+        });
+
     } catch (error) {
         console.error('Login error:', error);
         return res.status(500).json({ success: false, message: 'Server error' });
