@@ -79,7 +79,22 @@ exports.userProfileUpdate = async (req, res) => {
         });
     }
 };
+exports.fetchUserDetails = async (req, res) => {
+    const { userId } = req.body;
 
+    try {
+        const user = await Login.findOne({ userId });
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found.' });
+        }
+
+        return res.status(200).json({ success: true, user });
+    } catch (error) {
+        console.error('Error fetching user details:', error);
+        return res.status(500).json({ success: false, message: 'Server error' });
+    }
+};
 exports.userLogin = async (req, res) => {
     const { mobile, password } = req.body;
 

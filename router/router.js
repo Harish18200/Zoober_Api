@@ -13,6 +13,7 @@ router.post('/favouriteList', userController.favouriteList);
 router.post('/addFavourite', userController.addFavourite);
 router.post('/editFavourite', userController.editFavourite);
 router.post('/deleteFavourite', userController.deleteFavourite);
+router.post('/fetchUserDetails', userController.fetchUserDetails);
 
 
 
