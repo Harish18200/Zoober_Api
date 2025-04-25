@@ -96,6 +96,7 @@ exports.userProfileUpdate = async (req, res) => {
         res.status(200).json({
             success: true,
             message: 'User record updated successfully.',
+            
         });
     } catch (error) {
         res.status(500).json({
@@ -108,13 +109,13 @@ exports.fetchUserDetails = async (req, res) => {
     const { userId } = req.body;
 
     try {
-        const user = await user.findOne({ userId });
+        const foundUser = await user.findOne({ userId });
 
-        if (!user) {
+        if (!foundUser) {
             return res.status(404).json({ success: false, message: 'User not found.' });
         }
 
-        return res.status(200).json({ success: true, user });
+        return res.status(200).json({ success: true, user: foundUser });
     } catch (error) {
         console.error('Error fetching user details:', error);
         return res.status(500).json({ success: false, message: 'Server error' });
@@ -247,7 +248,6 @@ exports.deleteAccount = async (req, res) => {
         });
     }
 };
-
 exports.logout = async (req, res) => {
     const { userId } = req.body;
 
